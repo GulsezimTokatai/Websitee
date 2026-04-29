@@ -1,0 +1,232 @@
+ .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 4%;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.navbar a {
+    color: #000;
+    text-decoration: none;
+    margin: 0 8px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.navbar .nav-left a:hover, .navbar .nav-right a:hover {
+    color: #888;
+}
+body, html {
+    height: 100%;
+    background-color: #ffffff;
+}
+
+.main-nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 25px 50px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 10;
+    mix-blend-mode: difference;
+}
+
+.logo, nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-left: 20px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 баған */
+    grid-template-rows: 1fr 1fr;    /* 2 жол */
+    height: 100vh;
+    gap: 5px;
+    padding: 10px;
+    background-color: #fff; /* Фонды ақ қылсақ, аралары ақ болып көрінеді */
+}
+
+.grid-item {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-radius: 3px;  /* Бұрыштарын сәл дөңгелетсек, арасы ашылғанда әдемі көрінеді */
+}
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.7s ease-in-out;
+}
+
+.grid-item:hover .bg-image {
+    transform: scale(1.15); /* Сәл көбірек масштабтау */
+}
+
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Бірқалыпты үлкею */
+}
+
+.grid-item:hover .bg-image {
+    transform: scale(1.1); /* 10%-ға ішке қарай жақындайды */
+}
+
+.winter { background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),url("{% static 'website/03964de01db0c06e7174c21a9465afde.jpg' %}");
+.spring { background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/static/website/winter.jpg'); }
+.summer { background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/static/website/summer.jpg'); }
+.autumn { background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/static/website/a80cb0b31cfd0d58ebb37bf72a01be7c.jpg'); }
+
+/* МӘТІН */
+.overlay-text {
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    color: white;
+}
+
+.overlay-text h2 {
+    font-size: 48px;
+    letter-spacing: 10px;
+    font-weight: 900;
+    transition: 0.3s;
+}
+
+.overlay-text span {
+    font-size: 12px;
+    letter-spacing: 4px;
+    border-bottom: 1px solid white;
+    padding-bottom: 5px;
+    opacity: 0;
+    transition: 0.5s;
+}
+
+.grid-item:hover .overlay-text span {
+    opacity: 1;
+}
+footer {
+    background-color: #111; /* Терең қара түс */
+    color: #fff;
+    padding: 60px 10% 30px;
+    border-top: 1px solid #222;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer-title {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    margin-bottom: 25px;
+    color: #888;
+}
+
+/* Иконкалар стилі */
+.social-icons {
+    display: flex;
+    gap: 20px;
+}
+
+.social-icons img {
+    width: 18px; /* Кішірек, минималистік өлшем */
+    height: 18px;
+    filter: invert(1) opacity(0.6); /* Ақ түс және сәл мөлдірлік */
+    transition: 0.3s ease;
+}
+
+.social-icons img:hover {
+    filter: invert(1) opacity(1);
+    transform: translateY(-3px);
+}
+
+.footer {
+    background-color: #000; /* Таза қара түс */
+    color: #fff;
+    padding: 50px 8% 25px;
+    border-top: 1px solid #1a1a1a;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer-title {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 25px;
+}
+
+.social-icons img {
+    width: 22px;
+    height: 22px;
+    filter: invert(1);
+    opacity: 0.5;
+    transition: all 0.4s ease;
+}
+
+.social-icons img:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.footer-right {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: right;
+}
+
+.footer-right a {
+    color: #666;
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.footer-right a:hover {
+    color: #fff;
+}
+
+.footer-bottom {
+    margin-top: 60px;
+    text-align: center;
+    font-size: 9px;
+    color: #333;
+    letter-spacing: 3px;
+}

@@ -1,0 +1,257 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - GULsezim{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* Себеттің "секіру" анимациясы */
+@keyframes cartBounce {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.cart-bounce {
+    animation: cartBounce 0.3s ease-in-out;
+}
+
+/* Ұшатын суреттің жұмсақ көлеңкесі */
+.flying-img-style {
+    filter: brightness(1.1);
+}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #f4f1ee; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* NAVBAR */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+        .navbar a { text-decoration: none; color: #000; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-right: 20px; }
+        .cart-count { background: #000; color: #fff; border-radius: 50%; padding: 2px 7px; font-size: 10px; margin-left: 5px; }
+
+        .header-title { text-align: center; padding: 40px 0; text-transform: uppercase; letter-spacing: 8px; font-weight: 300; }
+
+        /* КАРТОЧКАЛАР */
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px; padding: 0 8% 80px; flex: 1; }
+        .item { background: #fff; padding: 10px; border-radius: 5px; transition: 0.4s; text-align: center; position: relative; }
+        .item img { width: 100%; height: 450px; object-fit: cover; border-radius: 3px; }
+        .item-name { font-size: 15px; text-transform: uppercase; letter-spacing: 2px; margin: 15px 0 5px; }
+        .item-price { font-size: 17px; color: #888; font-weight: bold; border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
+
+        .add-btn { background: #000; color: #fff; border: 1px solid #000; padding: 14px; width: 100%; margin-top: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; }
+
+        /* АНИМАЦИЯ СТИЛЬДЕРІ */
+        .flying-img { position: fixed; z-index: 9999; pointer-events: none; object-fit: cover; border-radius: 4px; transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .cart-bounce { animation: bounce 0.4s ease; }
+        @keyframes bounce { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* СЕБЕТТЕГІ САНДЫ БАСҚАРУ */
+        .quantity-controls { display: none; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; background: #f9f9f9; padding: 5px; border-radius: 4px; }
+        .item.in-cart .add-btn { display: none; }
+        .item.in-cart .quantity-controls { display: flex; }
+        .qty-btn { background: #000; color: #fff; border: none; width: 35px; height: 35px; cursor: pointer; }
+
+        /* МОДАЛЬДЫ ТЕРЕЗЕ */
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center; }
+        .modal-content { background:#fff; width:300px; padding:30px; border-radius:15px; text-align: center; position: relative; }
+        .size-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin: 20px 0; }
+        .size-btn-opt { padding: 10px; border: 1px solid #eee; cursor: pointer; background: #fff; }
+        .size-btn-opt.active { background: #000; color: #fff; }
+
+        /* FOOTER */
+        .footer { background-color: #000; color: #fff; padding: 40px 8%; margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; }
+        .footer-bottom { text-align: center; font-size: 10px; color: #333; margin-top: 20px; }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <h1 class="header-title">{{ category.name }}</h1>
+    {% if query %}
+    <div style="width: 100%; text-align: center; padding: 20px;">
+        <h3>"{{ query }}" бойынша табылған нәтижелер: {{ products.count }}</h3>
+        {% if not products %}
+            <p style="color: red; margin-top: 10px;">Кешіріңіз, ештеңе табылмады.</p>
+        {% endif %}
+    </div>
+{% endif %}
+
+    <div class="container">
+        {% for product in products %}
+        <div class="item" id="product-{{ product.id }}">
+            <img src="{{ product.image.url }}" class="product-image" alt="">
+            <div class="item-name">{{ product.title }}</div>
+            <div class="item-price">{{ product.price }} ₸</div>
+
+            <button type="button" class="add-btn" onclick="openSizeModal({{ product.id }}, '{{ product.image.url }}', '{% url 'add_to_cart' product.id %}')">
+                Себетке салу
+            </button>
+
+            <div class="quantity-controls" id="controls-{{ product.id }}">
+                <button class="qty-btn" onclick="changeQty({{ product.id }}, -1, '{% url 'add_to_cart' product.id %}')">−</button>
+                <span id="qty-val-{{ product.id }}">1</span>
+                <button class="qty-btn" onclick="changeQty({{ product.id }}, 1, '{% url 'add_to_cart' product.id %}')">+</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+<div id="sizeModal" class="modal-overlay">
+    <div class="modal-content">
+        <span onclick="closeSizeModal()" style="position:absolute; top:10px; right:15px; cursor:pointer;">&times;</span>
+
+        <h3 style="font-size:12px; letter-spacing:2px; text-transform: uppercase;">ӨЛШЕМДІ ТАҢДАҢЫЗ</h3>
+
+        <div class="size-grid">
+            <button class="size-btn-opt" onclick="selectSize(this, 'XS')">XS</button>
+            <button class="size-btn-opt" onclick="selectSize(this, 'S')">S</button>
+            <button class="size-btn-opt" onclick="selectSize(this, 'M')">M</button>
+            <button class="size-btn-opt" onclick="selectSize(this, 'L')">L</button>
+            <button class="size-btn-opt" onclick="selectSize(this, 'XL')">XL</button>
+            <button class="size-btn-opt" onclick="selectSize(this, '2XL')">2XL</button>
+        </div>
+
+        <button style="width:100%; background:#000; color:#fff; padding:12px; border:none; margin-top:20px; cursor:pointer;" onclick="confirmAndAdd()">Растау</button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>function confirmAndAdd() {
+    if (!tempProductData.size) {
+        alert("Өлшемді таңдаңыз!");
+        return;
+    }
+
+    const productItem = document.getElementById(`product-${tempProductData.id}`);
+    const imgElement = productItem ? productItem.querySelector('.product-image') : null;
+    const cartLink = document.getElementById('cart-link');
+
+    if (!imgElement || !cartLink) {
+        addToCartServer();
+        return;
+    }
+
+    const rect = imgElement.getBoundingClientRect();
+    const cartRect = cartLink.getBoundingClientRect();
+
+    // 1. Уақытша ұшатын суретті жасау
+    const flyingImg = document.createElement('img');
+    flyingImg.src = tempProductData.img;
+
+    // Бастапқы стиль (кішірек әрі әдемі)
+    Object.assign(flyingImg.style, {
+        position: 'fixed',
+        zIndex: '10000',
+        top: rect.top + 'px',
+        left: rect.left + 'px',
+        width: rect.width + 'px',
+        height: rect.height + 'px',
+        objectFit: 'cover',
+        borderRadius: '10px',
+        pointerEvents: 'none',
+        transition: 'all 0.8s cubic-bezier(0.45, 0.05, 0.55, 0.95)', // Табиғи қозғалыс
+        boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+        opacity: '1'
+    });
+
+    document.body.appendChild(flyingImg);
+
+    // 2. Ұшу анимациясын іске қосу
+    requestAnimationFrame(() => {
+        // Суреттің баратын нақты нүктесі (себеттің ортасы)
+        const targetX = cartRect.left + cartRect.width / 2 - 15;
+        const targetY = cartRect.top + cartRect.height / 2 - 15;
+
+        Object.assign(flyingImg.style, {
+            top: targetY + 'px',
+            left: targetX + 'px',
+            width: '30px',  // Себетке жақындағанда кішірейеді
+            height: '30px',
+            opacity: '0.3',
+            borderRadius: '50%', // Ұшу кезінде шар тәріздес болады
+            transform: 'rotate(720deg) scale(0.2)' // Айналып, сіңіп кетеді
+        });
+    });
+
+    // 3. Анимация біткен соң серверге жіберу
+    setTimeout(() => {
+        flyingImg.remove();
+
+        // Себет иконкасына кішкене "секіру" анимациясын қосу
+        cartLink.classList.add('cart-bounce');
+        setTimeout(() => cartLink.classList.remove('cart-bounce'), 300);
+
+        addToCartServer();
+    }, 800);
+}
+
+// Серверге жіберуді жеке функцияға шығардық
+function addToCartServer() {
+    let formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('size', tempProductData.size);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch(tempProductData.url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(() => {
+        location.reload();
+    })
+    .catch(() => {
+        location.reload();
+    });
+
+    closeSizeModal();
+}
+    let tempProductData = {};
+
+    function openSizeModal(id, img, url) {
+        tempProductData = { id, img, url, size: null };
+        document.getElementById('sizeModal').style.display = 'flex';
+        document.querySelectorAll('.size-btn-opt').forEach(b => b.classList.remove('active'));
+    }
+
+    function closeSizeModal() {
+        document.getElementById('sizeModal').style.display = 'none';
+    }
+    function selectSize(btn, size) {
+        document.querySelectorAll('.size-btn-opt').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        tempProductData.size = size;
+    }
+    function sendUpdate(url, quantity, size = 'M') {
+        let formData = new FormData();
+        formData.append('quantity', quantity);
+        formData.append('size', size);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            location.reload();
+        });
+    }
+
+    function changeQty(productId, delta, url) {
+        const qtySpan = document.getElementById(`qty-val-${productId}`);
+        let newQty = parseInt(qtySpan.innerText) + delta;
+        if (newQty < 1) {
+            sendUpdate(url, 0);
+            return;
+        }
+        sendUpdate(url, newQty);
+    }
+</script>
+{% endblock %}

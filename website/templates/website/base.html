@@ -1,0 +1,633 @@
+{% load static %}
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}GULsezim{% endblock %}</title>
+    <style>
+
+        /* Чатты ашатын негізгі түйме (Иконка) */
+#chat-trigger {
+    width: 65px; /* Өлшемі үлкейтілді */
+    height: 65px;
+    background: linear-gradient(135deg, #FF0FE7, #ff5e3a); /* Сайт стиліне сай градиент */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(255, 15, 231, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* Меңзерді апарғанда (hover) үлкейту */
+#chat-trigger:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 30px rgba(255, 15, 231, 0.6);
+}
+
+/* Соғу анимациясы (Пульсация) - назар аударту үшін */
+#chat-trigger::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 15, 231, 0.3);
+    border-radius: 50%;
+    z-index: -1;
+    animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Иконканың ішіндегі SVG түсі */
+#chat-trigger svg {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+/* Микрофон белсенді болғандағы қызыл нүкте */
+#mic-active-pulse {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 12px;
+    height: 12px;
+    background: #ff4b2b;
+    border: 2px solid white;
+    border-radius: 50%;
+    display: none; /* Әдепкі бойынша жасыру */
+}
+
+/* Микрофон қосылғанда анимация қосу */
+.recording #mic-active-pulse {
+    display: block;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+        .listen-btn-style {
+    display: block;
+    background: #f1f1f1;
+    border: none;
+    border-radius: 8px;
+    color: #ff5e3a;
+    font-size: 11px;
+    margin-top: 8px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.listen-btn-style:hover {
+    background: #ff5e3a;
+    color: white;
+}
+        #chat-body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 1. Терезе биіктігі мен ішкі элементтердің орналасуын реттеу */
+#chat-window {
+    width: 370px;
+    height: 600px;
+    max-height: 80vh; /* Экранға сыймай қалмау үшін */
+    background: #ffffff;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column; /* Элементтерді бірінің астына бірін қояды */
+    position: absolute;
+    bottom: 85px;
+    right: 0;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    overflow: hidden; /* Артық нәрсе сыртқа шықпайды */
+    transition: 0.3s ease;
+}
+
+/* 2. Шапканың орнынан қозғалмауы үшін */
+.chat-header {
+    padding: 15px 20px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0; /* МЫНАУ МАҢЫЗДЫ: шапка сығылмайды */
+    z-index: 10;
+}
+
+/* 3. Хабарламалар аймағы тек өз орнында айналуы (scroll) үшін */
+.chat-scroll {
+    flex-grow: 1; /* Барлық бос орынды иеленеді */
+    overflow-y: auto; /* Тек осы жерде айналдыру болады */
+    background: #f9f9f9;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 4. Төменгі бөліктер (FAQ және Инпут) де орнында қалуы керек */
+.faq-row {
+    flex-shrink: 0; /* Сығылуға жол бермейді */
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+.chat-footer {
+    flex-shrink: 0; /* Сығылуға жол бермейді */
+    padding: 15px;
+    background: #ffffff;
+    border-top: 1px solid #f0f0f0;
+}
+#chat-widget-container {
+    position: fixed;
+    bottom: 25px;
+    right: 35px;
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+}
+
+
+
+.bot-profile { display: flex; align-items: center; gap: 12px; }
+.bot-profile img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #eee; }
+.bot-profile h3 { font-size: 16px; color: #333; margin: 0; font-weight: 600; }
+.bot-profile p { font-size: 12px; color: #2ecc71; margin: 0; }
+
+
+
+/* ХАБАРЛАМАЛАРДЫҢ ДИЗАЙНЫ - СЫЙМАЙ ҚАЛУДЫ ЖӨНДЕУ */
+.msg {
+    max-width: 75%;
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word; /* Ұзын сөздерді келесі жолға түсіреді */
+    white-space: pre-wrap; /* Бос орындар мен жолдарды сақтайды */
+    position: relative;
+}
+
+.bot-msg {
+    align-self: flex-start;
+    background: #FF0FE74D;
+    color: #444;
+    border-radius: 18px 18px 18px 4px;
+    border: 1px solid #ececec;
+}
+
+.user-msg {
+    align-self: flex-end;
+    background: #FF0FE74D;
+    color: #ffffff;
+    border-radius: 18px 18px 4px 18px;
+}
+
+
+.faq-row::-webkit-scrollbar { display: none; }
+.faq-row button {
+    background: #fff;
+    border: 1px solid #eee;
+    color: #666;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+
+.input-group {
+    background: #f1f3f5;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
+}
+#user-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #333;
+    padding: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.voice-btn-left { background: none; border: none; font-size: 18px; cursor: pointer; color: #FF0FE74D; margin-right: 8px; }
+.send-btn { background: none; border: none; color: #FF0FE74D; font-size: 20px; cursor: pointer; }
+
+.chat-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; }
+
+:root {
+    --bg-color: #f8f8f8;
+    --nav-bg: #ffffff;
+    --text-color: #000000;
+    --border-color: #eeeeee;
+    --input-bg: #ffffff;
+    --footer-bg: #000000;
+    --footer-text: #ffffff;
+    --footer-muted: #888888;
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --nav-bg: #1e1e1e;
+    --text-color: #ffffff;
+    --border-color: #333333;
+    --input-bg: #2a2a2a;
+    --footer-bg: #000000;
+    --footer-text: #ffffff;
+    --footer-muted: #aaaaaa;
+}
+
+body {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
+
+.navbar {
+    background: var(--nav-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.navbar a,
+.navbar span {
+    color: var(--text-color) !important;
+}
+
+.navbar input[type="text"] {
+    background: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.footer {
+    background-color: var(--footer-bg) !important;
+    color: var(--footer-text) !important;
+}
+
+.footer .footer-title,
+.footer-right a,
+.footer-bottom {
+    color: var(--footer-muted) !important;
+}
+[data-theme="dark"] .social-icons img {
+    filter: invert(1) !important;
+} .footer-content {
+    display: flex;
+    justify-content: space-between; /* Сол және оң жаққа айыру */
+    align-items: flex-start; /* Жоғарыдан тегістеу */
+    padding-bottom: 30px;
+}
+
+/* Оң жақтағы сілтемелер тізімі */
+.footer-links {
+    display: flex;
+    flex-direction: column; /* Жазуларды бірінің астына бірін қою */
+    gap: 12px; /* Жазулардың арақашықтығы */
+    text-align: right; /* Мәтінді оң жаққа тегістеу */
+}
+
+.footer-links a {
+    color: #888;
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.footer-links a:hover {
+    color: #fff;
+}
+
+/* Сол жақтағы иконкалардың арасы */
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.social-icons img {
+    width: 20px;
+    filter: invert(1); /* Ақ түске айналдыру */
+    opacity: 0.7;
+}
+</style>
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+<header class="navbar">
+       <div class="nav-left">
+            <a href="{% url 'product' %}">Жаңа топтама</a>
+            <a href="{% url 'lookbook' %}">Материалдар</a>
+            <a href="{% url 'quiz' %}">Стиль Тесті</a>
+             <a href="{% url 'second' %}">Көмек</a>
+
+           <button id="theme-toggle" style="background:none; border:none; cursor:pointer; font-size:20px; margin: 0 10px;">
+    🌙
+</button>
+        </div>
+
+        <div class="nav-right">
+
+            <a href="{% url 'cart_detail' %}">🛒 СЕБЕТ ({{ total_items|default:0 }})</a>
+
+           <form action="{% url 'search_result' %}" method="get" style="display: inline-flex; align-items: center; margin: 0 15px; position: relative;">
+    <input type="text" name="q" placeholder="Тауар іздеу..." value="{{ query|default:'' }}"
+       style="padding: 7px 30px 7px 15px; border: 1px solid var(--border-color); border-radius: 2px; font-size: 12px; background: var(--input-bg); color: var(--text-color); width: 180px;">
+
+    {% if query %}
+        <a href="{% url 'search_result' %}" style="position: absolute; right: 35px; text-decoration: none; color: #999; font-size: 16px;">&times;</a>
+    {% endif %}
+
+    <button type="submit" style="background: none; border: none; cursor: pointer; position: absolute; right: 5px;">🔍</button>
+</form>
+
+ <a href="{% url 'index' %}">Басты бет</a>
+     <a href="{% url 'profile' %}" class="nav-profile">
+    {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle;">
+    {% else %}
+        <span>Профиль</span>
+    {% endif %}
+</a>
+
+        </div>
+    </header>
+
+{% block content %}{% endblock %}
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>БАЙЛАНЫС</h3>
+                <div class="social-icons">
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IN"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TK"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="TG"></a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <a href="#">Біз туралы</a>
+                <a href="#">Жеткізу және төлем</a>
+                <a href="#">Көмек орталығы</a>
+                <a href="#">Құпиялылық саясаты</a>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 GULSEZIM KZ.</div>
+    </footer>
+
+<div id="chat-widget-container">
+    <div id="chat-trigger" onclick="toggleChat()">
+        <span class="icon">💬</span>
+    </div>
+
+    <div id="chat-window" class="chat-hidden">
+        <div class="chat-header">
+            <div class="bot-profile">
+                <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" alt="Bot">
+                <div>
+                    <h3>Gulsezim Assistant</h3>
+                    <p>Online Stylist</p>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="close-btn">✕</button>
+        </div>
+
+        <div id="chat-body" class="chat-scroll"></div>
+
+        <div class="faq-row">
+            <button onclick="quickAsk('Көктем түс түріне не сәйкес?')">Көктем түсі</button>
+            <button onclick="quickAsk('Матаны қалай жуады?')">Мата күтімі</button>
+            <button onclick="quickAsk('Стиль таңдауға көмектес')">Стиль таңдау</button>
+        </div>
+
+        <div id="typing-indicator" class="hidden"><span>.</span><span>.</span><span>.</span></div>
+
+        <div class="chat-footer">
+            <div class="input-group">
+                <button id="mic-btn" onclick="toggleVoice()">🎤</button>
+                <input type="text" id="user-input" placeholder="Хабарлама жазыңыз...">
+                <button id="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const toggleBtn = document.getElementById('theme-toggle');
+const currentTheme = localStorage.getItem('theme');
+
+if (currentTheme) {
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (currentTheme === 'dark') toggleBtn.textContent = '☀️';
+}
+
+toggleBtn.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        toggleBtn.textContent = '🌙';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggleBtn.textContent = '☀️';
+    }
+});
+// Микрофон мен чат күйін бақылау
+let recognition;
+let isRecording = false;
+
+// 1. ЧАТТЫ АШУ/ЖАБУ
+function toggleChat() {
+    const chatWindow = document.getElementById('chat-window');
+    chatWindow.classList.toggle('chat-hidden');
+}
+
+// 2. МИКРОФОН: Нақты уақытта инпутқа жазу
+function toggleVoice() {
+    const userInput = document.getElementById('user-input');
+    const micBtn = document.getElementById('mic-btn');
+    const micBtnContainer = document.getElementById('chat-widget-container');
+ chatWindow.classList.toggle('chat-hidden');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Браузер дауысты тануды қолдамайды. Chrome қолданыңыз.");
+        return;
+    }
+
+    if (isRecording) {
+        recognition.stop();
+        return;
+    }
+    if (!chatWindow.classList.contains('chat-hidden')) {
+        chatTrigger.style.opacity = '0';
+        chatTrigger.style.pointerEvents = 'none'; // Басылмайтын ету
+    } else {
+        // Чат жабылса - иконканы қайта көрсету
+        chatTrigger.style.opacity = '1';
+        chatTrigger.style.pointerEvents = 'auto';
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'kk-KZ';
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    recognition.onstart = () => {
+        isRecording = true;
+        micBtn.innerHTML = "🛑"; // Қызыл белгі
+        micBtn.style.color = "red";
+        if (micBtnContainer) micBtnContainer.classList.add('recording');
+        userInput.placeholder = "Тыңдап тұрмын...";
+    };
+
+recognition.interimResults = true;
+recognition.continuous = false; // МІНДЕТТІ — false болуы керек
+
+recognition.onresult = (e) => {
+    let final = "";
+    let interim = "";
+
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+        const text = e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+            final += text;
+        } else {
+            interim += text;
+        }
+    }
+
+    // Сөйлеп жатқанда инпутқа жаз
+    userInput.value = final || interim;
+    console.log("Тыңдалды:", userInput.value); // тексеру үшін
+};
+
+    recognition.onerror = (event) => {
+        console.error("Микрофон қатесі:", event.error);
+        stopRecording();
+    };
+
+    recognition.onend = () => {
+    stopRecording();
+    if (userInput.value.trim()) {
+        setTimeout(() => sendMessage(), 800);
+    }
+};
+    function stopRecording() {
+        isRecording = false;
+        micBtn.innerHTML = "🎤";
+        micBtn.style.color = "";
+        if (micBtnContainer) micBtnContainer.classList.remove('recording');
+        userInput.placeholder = "Хабарлама жазыңыз...";
+    }
+
+    recognition.start();
+}
+
+// 3. ЖІБЕРУ ФУНКЦИЯСЫ
+function sendMessage() {
+    const input = document.getElementById('user-input');
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage('user', message);
+    input.value = '';
+
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) indicator.classList.remove('hidden');
+
+    // Django backend-пен байланыс (слэш / белгісіне назар аудар)
+    fetch(`/chat_with_stylist/?message=${encodeURIComponent(message)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (indicator) indicator.classList.add('hidden');
+            appendBotMessage(data.reply);
+        })
+        .catch(err => {
+            if (indicator) indicator.classList.add('hidden');
+            console.error("Fetch қатесі:", err);
+            appendBotMessage("Кешіріңіз, қате орын алды.");
+        });
+}
+
+// 4. БОТ ЖАУАБЫ: Typewriter (жазу) эффектісі және ТЫҢДАУ батырмасы
+function appendBotMessage(text) {
+    const chatBody = document.getElementById('chat-body');
+    const div = document.createElement('div');
+    div.className = 'msg bot-msg';
+    // Алдымен бос контейнер қосамыз
+    chatBody.appendChild(div);
+
+    let i = 0;
+    const interval = setInterval(() => {
+        div.innerText = text.slice(0, i + 1);
+        i++;
+
+        if (i >= text.length) {
+            clearInterval(interval);
+
+            // Жазылып біткен соң "Тыңдау" батырмасын қосу
+            const btn = document.createElement('button');
+            btn.innerHTML = '🔈 Тыңдау';
+            btn.className = 'listen-btn-style';
+            btn.onclick = () => speak(text);
+            div.appendChild(btn);
+        }
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }, 25);
+}
+
+// 5. ПАЙДАЛАНУШЫ ХАБАРЛАМАСЫ
+function appendMessage(sender, text) {
+    const chatBody = document.getElementById('chat-body');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg ${sender}-msg`;
+    msgDiv.innerText = text;
+    chatBody.appendChild(msgDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// 6. ДАУЫСТАП ОҚУ (Динамик)
+function speak(text) {
+    if (!window.speechSynthesis) return;
+
+    // Алдыңғы дыбысты тоқтату
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'kk-KZ'; // Қазақ тілі
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    window.speechSynthesis.speak(utterance);
+}
+
+// 7. ТЕЗ СҰРАҚТАР (FAQ)
+function quickAsk(text) {
+    document.getElementById('user-input').value = text;
+    sendMessage();
+}
+</script>
+
+{% block extra_js %}{% endblock %}
+</div>
+</body>
+</html>

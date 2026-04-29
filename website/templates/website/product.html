@@ -1,0 +1,156 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Каталог | GULsezim{% endblock %}
+
+{% block extra_css %}
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #f4f1ee;
+            font-family: 'Times New Roman', serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            background: #fff;
+        }
+        .navbar a {
+            text-decoration: none;
+            color: #000;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            padding: 0 10px 10px 10px;
+            height: 85vh;
+            flex-shrink: 0;
+        }
+
+        .grid-item {
+            position: relative;
+            background-color: #b3b3b3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            overflow: hidden;
+        }
+
+        .bg-image {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            z-index: 1;
+            transition: 0.6s ease;
+        }
+
+        .winter { background-image: url('{% static "website/winter2.jpg" %}'); }
+        .spring { background-image: url('{% static "website/spring.jpg" %}'); }
+        .summer { background-image: url('{% static "website/summer.jpg" %}'); }
+        .autumn { background-image: url('{% static "website/autumn.jpg" %}'); }
+
+        .overlay-text {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: #fff;
+        }
+
+        .overlay-text h2 {
+            font-size: 55px;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+        .sub-text {
+            display: block;
+            margin-top: 15px;
+            font-size: 11px;
+            letter-spacing: 3px;
+            border-bottom: 1px solid #fff;
+            padding-bottom: 5px;
+            text-transform: uppercase;
+
+            opacity: 0; /* БАСТАПҚЫДА КӨРІНБЕЙДІ */
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        /* HOVER ЭФФЕКТІ */
+        .grid-item:hover .sub-text {
+            opacity: 1; /* КӨРІНЕДІ */
+            transform: translateY(0);
+        }
+
+        .grid-item:hover .bg-image {
+            filter: brightness(0.7);
+            transform: scale(1.03);
+        }
+
+        .footer {
+            background-color: #000;
+            color: #fff;
+            padding: 60px 8% 30px;
+            width: 100%;
+            margin-top: auto;
+        }
+        .footer-content { display: flex; justify-content: space-between; }
+        .footer-section h3 { font-size: 12px; letter-spacing: 2px; color: #555; margin-bottom: 20px; }
+        .social-icons { display: flex; gap: 15px; }
+        .social-icons img { width: 20px; filter: invert(1); opacity: 0.6; }
+        .footer-links a { display: block; color: #888; text-decoration: none; font-size: 11px; margin-bottom: 10px; text-transform: uppercase; }
+        .footer-bottom { text-align: center; font-size: 10px; color: #333; margin-top: 30px; }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <main class="grid-container">
+        <a href="{% url 'category_detail' slug='winter' %}" class="grid-item">
+            <div class="bg-image winter"></div>
+            <div class="overlay-text">
+                <h2>ҚЫС</h2>
+                <span class="sub-text">Топтаманы көру</span>
+            </div>
+        </a>
+        <a href="{% url 'category_detail' slug='spring' %}" class="grid-item">
+            <div class="bg-image spring"></div>
+            <div class="overlay-text">
+                <h2>КӨКТЕМ</h2>
+                <span class="sub-text">Жаңа тауарлар</span>
+            </div>
+        </a>
+        <a href="{% url 'category_detail' slug='summer' %}" class="grid-item">
+            <div class="bg-image summer"></div>
+            <div class="overlay-text">
+                <h2>ЖАЗ</h2>
+                <span class="sub-text">Sale -50%</span>
+            </div>
+        </a>
+        <a href="{% url 'category_detail' slug='autumn' %}" class="grid-item">
+            <div class="bg-image autumn"></div>
+            <div class="overlay-text">
+                <h2>КҮЗ</h2>
+                <span class="sub-text">Lookbook 2026</span>
+            </div>
+        </a>
+    </main>
+
+{% endblock %}
+

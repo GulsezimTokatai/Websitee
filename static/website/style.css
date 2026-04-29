@@ -1,0 +1,359 @@
+
+body {
+    background-color: red !important;
+    margin: 0;
+    padding: 0;
+}
+ .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Элементтерді ортаға түзеу */
+    padding: 15px 4%;    /* Паддингті азайттық (25px-ден 15px-ке) */
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.navbar a {
+    color: #000;
+    text-decoration: none;
+    margin: 0 8px;       /* Сілтемелер арасын жақындаттық (15px-ден 8px-ге) */
+    font-size: 12px;     /* Шрифт көлемін кішірейттік (13px-ден 11px-ге) */
+    text-transform: uppercase;
+    letter-spacing: 0.8px; /* Әріп арасын жинақы кылдық (1.5px-ден 0.8px-ге) */
+    font-weight: 600;
+    white-space: nowrap;  /* Мәтін келесі жолға түсіп кетпеуі үшін */
+}
+
+.navbar .nav-left a:hover, .navbar .nav-right a:hover {
+    color: #888;
+}
+
+.main-banner {
+    padding: 20px 20px 0 20px; /* Астыңғы padding-ді 0 қылдық */
+}
+
+.banner-img {
+    width: 100%;
+    height: 450px;
+    background-image: url('/static/website/1ee729b4cea6a75eca7ae70f3f4472f0.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px;
+    display: flex;
+    align-items: flex-end; /* Батырманы астына түсіру */
+    justify-content: flex-end; /* Батырманы оңға жылжыту */
+    position: relative;
+    padding: 30px; /* Шетінен арақашықтық */
+    box-sizing: border-box;
+}
+
+.banner-btn {
+    display: inline-block; /* Сүрту (padding) дұрыс жұмыс істеуі үшін */
+    padding: 16px 40px;
+    background-color: #1A1A1A;
+    color: #FFFFF0;
+    border: 1px solid #1A1A1A;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-decoration: none; /* Сызбаны алып тастау */
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.banner-btn:hover {
+    background-color: white; /* Скриншотта ақ болып көрінуі мүмкін */
+    color: #1A1A1A;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* БАСҚАНДАҒЫ ЭФФЕКТ (Active) */
+.banner-btn:active {
+    transform: scale(0.95); /* Сәл кішірейіп, басылғандай әсер береді */
+}
+
+.carousel-container {
+    margin-top: 10px; /* Үстіңгі баннерге жақындату */
+    padding: 10px 20px; /* Padding-ді азайттық */
+}
+.carousel-container h3 {
+    text-align: center; /* ТАҚЫРЫПТЫ ОРТАҒА ҚОЙДЫҚ */
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+.carousel-wrapper {
+    display: flex;
+    overflow-x: auto;
+    gap: 25px;
+    padding-bottom: 5px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Скролл жолағын сәл көрінетіндей қылу (немесе жасырып тастауға болады) */
+.carousel-wrapper::-webkit-scrollbar {
+    height: 6px;
+}
+.carousel-wrapper::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 10px;
+}
+
+/* КАРТОЧКА (Суретті үлкейту және жиек қосу) */
+.card {
+    flex: 0 0 250px; /* СУРЕТТІҢ ЕНІ: 150-ден 250-ге үлкейттім */
+    text-decoration: none;
+    color: #333;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Тышқанды апарғанда сәл көтеріледі */
+}
+
+.card img {
+    width: 250px; /* Ені */
+    height: 250px; /* БИІКТІГІ: Үлкейтілді */
+    object-fit: cover;
+    border-radius: 12px;
+    /* ЖІҢІШКЕ ЖИЕК (border) */
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); /* Жеңіл көлеңке */
+}
+
+.card p {
+    margin-top: 12px;
+    font-size: 16px;
+    font-weight: bold;
+}
+/* Карусель мен жаңа баннер арасындағы орын */
+.info-banner {
+    margin-top: 50px; /* Арақашықтық */
+    padding: 0 20px; /* Шетінен сәл орын */
+    margin-bottom: 50px;
+}
+
+.info-container {
+    width: 100%;
+    height: 500px;
+    /* БЕТТІ ТОЛЫҚ АЛЫП ТҰРАТЫН СУРЕТ */
+    background-image: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.1)),
+                      url('розе.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px;
+    display: flex;
+    align-items: center; /* Мәтінді тігінен ортаға қою */
+    padding-left: 50px; /* Мәтінді сол жақ шеттен жылжыту */
+    margin-top: 10px; /* Жоғарыдағы жолаққа жақындату */
+    padding: 0 20px;
+    margin-bottom: 20px; /* Футерге жақындату */
+    padding-left: 50px;
+}
+
+.info-text {
+    color: white;
+    max-width: 400px; /* Жазу тым жайылып кетпеуі үшін */
+}
+
+.info-text h2 {
+    font-size: 36px;
+    margin-bottom: 15px;
+    letter-spacing: 2px;
+}
+
+.info-text p {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.info-link {
+    color: #ff4757;
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 2px solid #ff4757;
+    padding-bottom: 5px;
+}
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+    padding: 8px 0;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
+.marquee-content {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee-animation 15s linear infinite;
+}
+
+.marquee-content span {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    font-family: 'Arial Black', sans-serif; /* Кез келген компьютерде бар әдемі шрифт */
+    letter-spacing: 3px;
+    padding-right: 40px;
+}
+
+@keyframes marquee-animation {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+/* ФУТЕР СТИЛІ */
+.footer {
+    background-color: #1a1a1a; /* Әдемі күңгірт түс */
+    color: white;
+    padding: 40px 8% 25px;
+    margin-top: -10px; /* БАННЕРГЕ ЖАҚЫНДАТУ */
+    border-top: 1px solid #1a1a1a;
+
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #333;
+    padding-bottom: 30px;
+}
+
+/* Сол жақ бөлім */
+.footer-left h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.social-icons img {
+    width: 30px; /* Иконка өлшемі */
+    height: 30px;
+    filter: invert(1); /* Қара иконкаларды ақ түске айналдыру */
+    transition: 0.3s;
+}
+
+.social-icons img:hover {
+    transform: scale(1.2);
+}
+
+/* МИНИМАЛИСТІК ФУТЕР */
+.footer {
+    background-color: #111; /* Терең қара түс */
+    color: #fff;
+    padding: 60px 10% 30px;
+    border-top: 1px solid #222;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer-title {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    margin-bottom: 25px;
+    color: #888;
+}
+
+/* Иконкалар стилі */
+.social-icons {
+    display: flex;
+    gap: 20px;
+}
+
+.social-icons img {
+    width: 18px; /* Кішірек, минималистік өлшем */
+    height: 18px;
+    filter: invert(1) opacity(0.6); /* Ақ түс және сәл мөлдірлік */
+    transition: 0.3s ease;
+}
+
+.social-icons img:hover {
+    filter: invert(1) opacity(1);
+    transform: translateY(-3px);
+}
+
+.footer {
+    background-color: #000; /* Таза қара түс */
+    color: #fff;
+    padding: 50px 8% 25px;
+    border-top: 1px solid #1a1a1a;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer-title {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #555; /* Өте күңгірт сұр */
+    margin-bottom: 30px;
+}
+
+/* КОНТУРЛЫ ИКОНКАЛАР СТИЛІ */
+.social-icons {
+    display: flex;
+    gap: 25px;
+}
+
+.social-icons img {
+    width: 22px;
+    height: 22px;
+    filter: invert(1); /* Иконканы ақ түсті сызықтарға айналдыру */
+    opacity: 0.5;
+    transition: all 0.4s ease;
+}
+
+.social-icons img:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* ОҢ ЖАҚТАҒЫ ТІЗІМ */
+.footer-right {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: right;
+}
+
+.footer-right a {
+    color: #666; /* Күңгірт жазулар */
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.footer-right a:hover {
+    color: #fff; /* Тышқанды апарғанда ақ болады */
+}
+
+.footer-bottom {
+    margin-top: 60px;
+    text-align: center;
+    font-size: 9px;
+    color: #333;
+    letter-spacing: 3px;
+}

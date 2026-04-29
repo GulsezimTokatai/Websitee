@@ -1,0 +1,365 @@
+{% load static %}
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Біз туралы | GULsezim</title>
+    <link rel="stylesheet" href="{% static 'website/about_style.css' %}">
+</head>
+<style>
+    :root {
+    --bg-color: #f4f1ee;
+    --nav-bg: #ffffff;
+    --text-color: #000000;
+    --border-color: #dddddd;
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --nav-bg: #1e1e1e;
+    --text-color: #ffffff;
+    --border-color: #333333;
+    --card-bg: #1e1e1e;
+    --input-bg: #2a2a2a;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background 0.3s, color 0.3s;
+}
+
+.navbar { background: var(--nav-bg); border-bottom: 1px solid var(--border-color); }
+.search-box input, .search-box form input {
+    background-color: var(--input-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Письмолар мен FAQ блоктарын қараңғы режимге бейімдеу */
+.review-card, .faq-item {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Мәтіндердің бәріне ортақ ереже */
+h1, h2, h3, h4, p, span, .faq-question, .brand-desc {
+    color: var(--text-color) !important;
+}
+
+.faq-question {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+.faq-answer {
+    max-height: 0;
+    overflow: hidden; /* Мәтін асып кетпеуі үшін */
+    transition: all 0.4s ease-in-out; /* Бірқалыпты ашылу */
+    opacity: 0; /* Жабық кезде көрінбейді */
+}
+
+/* Ашылған кезде мәтін анық көрінуі үшін */
+.faq-question + .faq-answer[style*="max-height"] {
+    opacity: 1;
+}
+
+/* Егер сыртқы контейнер болса, оның биіктігі auto болуы керек */
+.faq-item {
+    height: auto !important;
+    overflow: visible !important;
+}
+/* Қараңғы режимде сілтемелердің түсін мәжбүрлеу */
+[data-theme="dark"] a {
+    color: var(--text-color) !important;
+}
+
+/* Футерді реттеу (қараңғы режимде футер тым қара болып кетпеуі үшін) */
+.footer {
+    background-color: #000000 !important; /* Негізгі қара түс */
+    color: #ffffff !important;
+    padding: 40px 0;
+}
+
+/* 1. Футердің негізгі контейнерін реттеу */
+.footer {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    padding: 30px 5% !important; /* Өлшемін тым үлкен қылмаймыз */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 2. Футер ішіндегі барлық мәтіндер мен тақырыптарды ақ қылу */
+.footer h3,
+.footer .footer-title,
+.footer-left h3,
+.footer-right a,
+.footer-bottom p {
+    color: #ffffff !important;
+    margin-bottom: 10px;
+    display: block; /* Жазулар бір-бірінің үстіне мінбеуі үшін */
+}
+
+/* 3. Футердің ішкі блоктанатын құрылымы (Flexbox) */
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap; /* Мобильді нұсқада сынуы үшін */
+    gap: 20px;
+}
+
+/* 4. Әлеуметтік иконкалардың түсі (егер олар қара болса) */
+.social-icons img {
+    filter: invert(1); /* Иконкаларды ақ түске айналдырады */
+    width: 20px;
+    margin-right: 10px;
+}
+
+/* 5. Ең астындағы авторлық құқық мәтіні */
+.footer-bottom {
+    border-top: 1px solid #333;
+    margin-top: 20px;
+    padding-top: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.footer-bottom p {
+    font-size: 10px;
+    color: #888 !important; /* Бұл жерді сәл сұр қылса болады */
+}
+
+/* 4. Навбардағы іздеу батырмасы (лупа) қараңғы режимде көрінбей қалса */
+[data-theme="dark"] .search-box button {
+    filter: invert(1); /* Қара лупаны ақ қылады */
+}
+    /* Барлық секцияларға ортақ фон */
+[data-theme="dark"] body,
+[data-theme="dark"] main,
+[data-theme="dark"] section,
+[data-theme="dark"] .layered-page {
+    background-color: var(--bg-color) !important;
+}
+
+/* Пікірлер бөлімінің тақырыбы көрінбей тұрса */
+[data-theme="dark"] h2,
+[data-theme="dark"] h1 {
+    color: var(--text-color) !important;
+}
+
+/* Навбарды жинақы қылу */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Арақашықтықты азайттық */
+}
+
+/* Іздеу формасын бір сызыққа жинау */
+.search-box {
+    display: flex;
+    align-items: center;
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--input-bg);
+}
+
+.search-box input {
+    border: none !important; /* Форманың сыртында рамка бар, ішіндегіні өшіреміз */
+    padding: 6px 30px 6px 10px;
+    background: transparent !important;
+    width: 150px;
+}
+
+.search-box button {
+    position: absolute;
+    right: 5px;
+}
+
+/* Пікірлер карточкаларын сәл жұмсарту (қараңғы режимде) */
+[data-theme="dark"] .review-card {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+</style>
+<body>
+  <header class="navbar">
+       <div class="nav-left">
+            <a href="{% url 'product' %}">Жаңа топтама</a>
+            <a href="{% url 'lookbook' %}">Материалдар</a>
+            <a href="{% url 'quiz' %}">Стиль Тесті</a>
+             <a href="{% url 'second' %}">Көмек</a>
+           <button id="theme-toggle" style="background:none; border:none; cursor:pointer; font-size:20px; margin: 0 10px;">
+    🌙
+</button>
+        </div>
+
+        <div class="nav-right">
+
+            <a href="{% url 'cart_detail' %}">🛒 СЕБЕТ ({{ total_items|default:0 }})</a>
+
+           <form action="{% url 'search_result' %}" method="get" style="display: inline-flex; align-items: center; margin: 0 15px; position: relative;">
+    <input type="text" name="q" placeholder="Тауар іздеу..." value="{{ query|default:'' }}"
+       style="padding: 7px 30px 7px 15px; border: 1px solid var(--border-color); border-radius: 2px; font-size: 12px; background: var(--input-bg); color: var(--text-color); width: 180px;">
+
+    {% if query %}
+        <a href="{% url 'search_result' %}" style="position: absolute; right: 35px; text-decoration: none; color: #999; font-size: 16px;">&times;</a>
+    {% endif %}
+
+    <button type="submit" style="background: none; border: none; cursor: pointer; position: absolute; right: 5px;">🔍</button>
+</form>
+
+ <a href="{% url 'index' %}">Басты бет</a>
+     <a href="{% url 'profile' %}" class="nav-profile">
+    {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" style="width: 30px; height: 30px; border-radius: 50%; vertical-align: middle;">
+    {% else %}
+        <span>Профиль</span>
+    {% endif %}
+</a>
+
+        </div>
+    </header>
+
+    <main class="layered-page">
+        <section class="section-about">
+            <div class="about-container">
+                <div class="about-image">
+                    <img src="{% static 'website/635c95e205c7a32788ad8f95021c674c.jpg' %}" alt="Біз туралы">
+                </div>
+                <div class="about-info">
+                    <h1>БІЗ ТУРАЛЫ</h1>
+                    <p class="brand-desc">GULsezim — бұл жай ғана дүкен емес, бұл өмір салты. Біз 2020 жылдан бастап ең сапалы маталардан заманауи киімдер тігумен айналысамыз. Біздің мақсатымыз — әрбір тұтынушыға жайлылық пен ерекше стиль сыйлау.</p>
+
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <button class="faq-question">Жеткізу тегін бе? <span class="arrow">↘</span></button>
+                            <div class="faq-answer">
+                                <p>Иә, Қазақстанның кез келген нүктесіне 20 000 ₸ жоғары тапсырыстарды тегін жеткіземіз.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">Көлемді қалай таңдаймын? <span class="arrow">↘</span></button>
+                            <div class="faq-answer">
+                                <p>Біздің сайтта арнайы өлшем кестесі бар, сондай-ақ менеджерлеріміз көмектесуге дайын.</p>
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-question">Жұмыс уақытыңыз қандай? <span class="arrow">↘</span></button>
+                            <div class="faq-answer">
+                                <p>Біз күн сайын үзіліссіз сағат 10:00-ден 22:00-ге дейін жұмыс істейміз.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-reviews">
+            <div class="reviews-header">
+                <h2>КЛИЕНТТЕРДІҢ ШЫНАЙЫ ПІКІРЛЕРІ</h2>
+            </div>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <h4>Әнел</h4>
+                    <p>«Көйлек өте сапалы, матасы жұмсақ екен. Жеткізу өте жылдам болды, рахмет!»</p>
+                    <span class="date">09.10.2025</span>
+                </div>
+                <div class="review-card">
+                    <h4>Диас</h4>
+                    <p>«Шалбар дәл өлшеміме келді. Сапасы бағасына тұрарлық. Тағы да тапсырыс беремін.»</p>
+                    <span class="date">06.10.2025</span>
+                </div>
+                <div class="review-card">
+                    <h4>Малика</h4>
+                    <p>«Дизайны ерекше, киімдері өте ыңғайлы. Барлық достарыма ұсынып жүрмін!»</p>
+                    <span class="date">02.10.2025</span>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <h3 class="footer-title">БАЙЛАНЫС</h3>
+                <div class="social-icons">
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WA"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IN"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TT"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/145/145813.png" alt="VK"></a>
+                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="TG"></a>
+                </div>
+            </div>
+
+            <div class="footer-right">
+                <a href="#">БІЗ ТУРАЛЫ</a>
+                <a href="#">ЖЕТКІЗУ ЖӘНЕ ТӨЛЕМ</a>
+                <a href="#">КӨМЕК ОРТАЛЫҒЫ</a>
+                <a href="#">ҚҰПИЯЛЫЛЫҚ САЯСАТЫ</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 GULSEZIM KZ.</p>
+        </div>
+    </footer>
+
+    <script>const questions = document.querySelectorAll('.faq-question');
+
+questions.forEach(q => {
+    q.addEventListener('click', () => {
+        const answer = q.nextElementSibling;
+        const arrow = q.querySelector('.arrow');
+
+        // Егер стиль мүлдем орнатылмаса, оны 0-ге теңестіреміз
+        if (!answer.style.maxHeight || answer.style.maxHeight === "0px") {
+            // scrollHeight мәніне қосымша 40-50px қосыңыз (padding үшін)
+            answer.style.maxHeight = (answer.scrollHeight + 50) + "px";
+            answer.style.padding = "15px 20px 25px 20px"; // Астыңғы жағына көбірек орын
+            if (arrow) arrow.style.transform = "rotate(180deg)";
+        } else {
+            answer.style.maxHeight = "0px";
+            answer.style.padding = "0 20px";
+            if (arrow) arrow.style.transform = "rotate(0deg)";
+        }
+    });
+});
+
+const toggleBtn = document.getElementById('theme-toggle');
+const currentTheme = localStorage.getItem('theme');
+
+if (currentTheme) {
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (currentTheme === 'dark') toggleBtn.textContent = '☀️';
+}
+
+toggleBtn.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        toggleBtn.textContent = '🌙';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggleBtn.textContent = '☀️';
+    }
+});
+    </script>
+
+</body>
+</html>

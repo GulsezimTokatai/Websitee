@@ -1,0 +1,100 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Каталог | GULsezim{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'website/index.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <section class="main-banner">
+        <div class="banner-img">
+            <a href="{% url 'product' %}" class="banner-link">
+                <button class="banner-btn">ТОПТАМАНЫ КӨРУ</button>
+            </a>
+        </div>
+    </section>
+
+    <section class="carousel-container">
+        <h3>Жаңа тауарлар</h3>
+        <div class="carousel-wrapper">
+            <a href="{% url 'product' %}" class="card">
+                <img src="{% static 'website/4e711f13b52febefe6a824c8d6a1c849.jpg' %}" alt="Киім 1">
+                <p>Сумка - 12 000 ₸</p>
+            </a>
+            <a href="{% url 'product' %}" class="card">
+                <img src="{% static 'website/1ad02cdc547fd32b34d1610224de7b00.jpg' %}" alt="Киім 2">
+                <p>Шалбар - 15 000 ₸</p>
+            </a>
+            <a href="{% url 'product' %}" class="card">
+                <img src="{% static 'website/b45d9d4b900b9817bd0998728e654b56.jpg' %}" alt="Киім 3">
+                <p>Юбка - 25 000 ₸</p>
+            </a>
+            <a href="{% url 'product' %}" class="card">
+                <img src="{% static 'website/b586e6356dabd11441eaa50a3629679d.jpg' %}" alt="Киім 4">
+                <p>Юбка, Джемпер - 18 000 ₸</p>
+            </a>
+            <a href="{% url 'product' %}" class="card">
+                <img src="{% static 'website/0835fff6f7e13711bf479aebefcd318a.jpg' %}" alt="Киім 5">
+                <p>Джемпер - 10 000 ₸</p>
+            </a>
+            <a href="{% url 'product' %}" class="card">
+                <img src="{% static 'website/cdd2b0d8dd22191a55b49b3328030fb5.jpg' %}" alt="Киім 6">
+                <p>Пиджак - 10 000 ₸</p>
+            </a>
+        </div>
+    </section>
+
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <span>ТЕГІН ЖЕТКІЗУ • ЖАҢА ТОПТАМА • СКИДКИ -50% • КҮЗГІ СӘН •</span>
+            <span>ТЕГІН ЖЕТКІЗУ • ЖАҢА ТОПТАМА • СКИДКИ -50% • КҮЗГІ СӘН •</span>
+        </div>
+    </div>
+
+    <section class="info-banner">
+        <div class="info-container">
+            <div class="info-text">
+                <h2>БІЗДІҢ САПА</h2>
+                <p>Барлық киімдер табиғи матадан жасалған. <br>
+                   Қазақстан бойынша жеткізу тегін.</p>
+                <a href="{% url 'second' %}" class="info-link">Толығырақ білу...</a>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+    const wrapper = document.querySelector('.carousel-wrapper');
+    const scrollStep = 275;
+    function autoScroll() {
+        if (!wrapper) return;
+        let currentScroll = wrapper.scrollLeft + scrollStep;
+        if (currentScroll >= (wrapper.scrollWidth - wrapper.clientWidth - 10)) {
+            wrapper.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+            wrapper.scrollTo({ left: currentScroll, behavior: 'smooth' });
+        }
+    }
+    let timer = setInterval(autoScroll, 2000);
+    wrapper.addEventListener('mouseenter', () => clearInterval(timer));
+    wrapper.addEventListener('mouseleave', () => timer = setInterval(autoScroll, 2000));
+
+    const links = document.querySelectorAll('a');
+    links.forEach(link => {
+        link.addEventListener('click', function(event) {
+            const href = this.getAttribute('href');
+            if (href && href !== '#' && !href.startsWith('javascript') && !href.includes('admin')) {
+                const confirmExit = confirm("Сен келесі бетке өткің келе ме?");
+                if (!confirmExit) event.preventDefault();
+            }
+        });
+    });
+
+</script>
+{% endblock %}

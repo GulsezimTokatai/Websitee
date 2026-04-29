@@ -1,0 +1,315 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Іздеу нәтижесі - GULsezim{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* Модальды терезе стилі */
+#sizeModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Модаль ішіндегі ақ блок */
+.modal-content {
+    background: #fff;
+    padding: 30px;
+    width: 350px;
+    text-align: center;
+    position: relative;
+    border-radius: 4px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+/* Өлшем батырмаларының стилі */
+.size-btn-opt {
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: none;
+    cursor: pointer;
+    font-family: 'Times New Roman';
+    transition: 0.3s;
+}
+            .size-btn-opt.active { background: #000 !important; color: #fff !important; border-color: #000 !important; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #f4f1ee; font-family: 'Times New Roman', serif; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* NAVBAR */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+        .navbar a { text-decoration: none; color: #000; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-right: 15px; }
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+
+        /* SEARCH FORM */
+        .search-box { position: relative; display: flex; align-items: center; }
+        .search-box input { padding: 8px 35px 8px 15px; border: 1px solid #000; width: 220px; font-family: 'Times New Roman'; font-size: 12px; }
+        .clear-btn { position: absolute; right: 35px; text-decoration: none; color: #000; font-weight: bold; font-size: 18px; }
+
+        /* MAIN LAYOUT */
+        .main-content { display: flex; gap: 30px; padding: 40px 5%; flex: 1; }
+
+        /* SIDEBAR FILTER */
+        .sidebar { width: 280px; background: #fff; padding: 25px; border-radius: 4px; height: fit-content; border: 1px solid #eee; }
+        .sidebar h3 { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+        .filter-group { margin-bottom: 20px; }
+        .filter-group label { display: block; font-size: 12px; margin-bottom: 8px; color: #555; }
+        .filter-input { width: 100%; padding: 10px; border: 1px solid #ddd; margin-bottom: 10px; font-family: 'Times New Roman'; }
+        .apply-btn { width: 100%; background: #000; color: #fff; border: none; padding: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 11px; transition: 0.3s; }
+        .apply-btn:hover { background: #333; }
+
+        /* PRODUCT GRID */
+        .results-container { flex: 1; }
+        .results-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .item { background: #fff; padding: 10px; text-align: center; border-radius: 4px; transition: 0.3s; }
+        .item:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .item img { width: 100%; height: 400px; object-fit: cover; margin-bottom: 15px; }
+         .item-price { font-weight: bold; color: #000; }
+
+        /* FOOTER */
+        .footer { background-color: #000; color: #fff; padding: 40px 8%; margin-top: auto; }
+        .footer-container { display: flex; justify-content: space-between; align-items: center; }
+        .footer-title { font-size: 14px; letter-spacing: 2px; margin-bottom: 15px; }
+        .social-icons a { margin-right: 15px; }
+        /* Тауардың аты мен бағасы */
+.item-name {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    color: inherit; /* Ата-аналық блоктан түсті алады */
+}
+
+/* Sidebar (Фильтр) тақырыбы */
+.sidebar h3 {
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    border-bottom: 1px solid currentColor; /* Сызық түсі мәтінмен бірдей болады */
+    padding-bottom: 10px;
+    color: inherit;
+}
+
+/* Жалпы түстерді бекіту */
+body {
+    background-color: #f4f1ee;
+    color: #000; /* Әдепкі бойынша қара мәтін */
+}
+
+/* СЕБЕТКЕ САЛУ және ФИЛЬТР батырмалары әрқашан көрінуі тиіс */
+.apply-btn {
+    background: #000 !important;
+    color: #fff !important;
+    border: 1px solid #000;
+}
+
+/* ТАУАР АТЫ МЕН БАҒАСЫ - Егер фон қара болса, мәтінді ақ қылу */
+.item-name, .item-price, .sidebar h3, .filter-group label {
+    color: #000; /* Light mode */
+}
+
+/* DARK MODE МӘСЕЛЕСІН ШЕШУ */
+/* Егер сіздің сайтыңыздың фоны қара болса, мына кодты міндетті түрде қосыңыз */
+@media (prefers-color-scheme: dark) {
+    body { background-color: #121212; }
+
+    .item-name, .item-price, .sidebar h3, .filter-group label {
+        color: #ffffff !important; /* Мәтінді мәжбүрлі түрде ақ қылу */
+    }
+
+    .item {
+        background: #1e1e1e !important; /* Тауар блогының фоны */
+        border: 1px solid #333;
+    }
+
+    .sidebar {
+        background: #1e1e1e !important;
+        border: 1px solid #333;
+    }
+
+    .filter-input {
+        background: #2d2d2d;
+        color: #fff;
+        border: 1px solid #444;
+    }
+}
+
+/* МОДАЛЬДЫ ТЕРЕЗЕ - Ол әрқашан ақ болып қалуы керек (немесе қараңғы) */
+.modal-content {
+    background: #ffffff !important;
+    color: #000 !important;
+}
+
+.modal-content h3 {
+    color: #000 !important;
+}
+
+.size-btn-opt {
+    border: 1px solid #ccc !important;
+    color: #000 !important;
+}      .social-icons img { width: 20px; filter: invert(1); }
+        .footer-right a { display: block; color: #fff; text-decoration: none; font-size: 11px; margin-bottom: 8px; text-align: right; letter-spacing: 1px; }
+        .footer-bottom { text-align: center; font-size: 10px; color: #555; margin-top: 30px; border-top: 1px solid #222; padding-top: 20px; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<main class="main-content">
+        <aside class="sidebar">
+           <h3 style="color: #000; border-bottom: 1px solid #000;">Фильтр</h3>
+            <form action="{% url 'search_result' %}" method="get">
+                <input type="hidden" name="q" value="{{ query }}">
+                <div class="filter-group">
+                    <label>Баға бойынша (₸):</label>
+                    <input type="number" name="min_price" class="filter-input" placeholder="Мин. баға" value="{{ min_price }}">
+                    <input type="number" name="max_price" class="filter-input" placeholder="Макс. баға" value="{{ max_price }}">
+                </div>
+                <button type="submit" class="apply-btn">Қолдану</button>
+            </form>
+        </aside>
+
+        <section class="results-container">
+            <div class="results-header">
+                <h2 style="font-weight: 300; letter-spacing: 3px; text-transform: uppercase;">
+                    {% if query %} "{{ query }}" бойынша нәтиже {% else %} Барлық тауарлар {% endif %}
+                </h2>
+                <span style="font-size: 12px; color: #888;">Табылды: {{ products.count }} тауар</span>
+            </div>
+
+            <div class="container">
+                {% for product in products %}
+                <div class="item" id="product-{{ product.id }}">
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-image">
+                    <div class="item-name">{{ product.title }}</div>
+                    <div class="item-price">{{ product.price }} ₸</div>
+                    <button class="apply-btn" style="margin-top: 15px;"
+                            onclick="openSizeModal('{{ product.id }}', '{{ product.image.url }}', '{% url 'add_to_cart' product.id %}')">
+                        Себетке салу
+                    </button>
+                </div>
+                {% empty %}
+                <div style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <p>Кешіріңіз, мұндай тауар табылмады.</p>
+                    <a href="{% url 'product' %}" style="color: #000; text-decoration: underline; font-size: 12px;">Барлық тауарларға қайту</a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <div id="sizeModal">
+        <div class="modal-content">
+            <span onclick="closeSizeModal()" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">&times;</span>
+            <h3 style="font-size:12px; letter-spacing:2px; margin-bottom:20px;">ӨЛШЕМДІ ТАҢДАҢЫЗ</h3>
+
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:20px;">
+                <button class="size-btn-opt" onclick="selectSize(this, 'XS')">XS</button>
+                <button class="size-btn-opt" onclick="selectSize(this, 'S')">S</button>
+                <button class="size-btn-opt" onclick="selectSize(this, 'M')">M</button>
+                <button class="size-btn-opt" onclick="selectSize(this, 'L')">L</button>
+                <button class="size-btn-opt" onclick="selectSize(this, 'XL')">XL</button>
+            </div>
+
+            <button onclick="confirmAndAdd()" class="apply-btn">Растау</button>
+        </div>
+    </div>
+><script>
+        let tempProductData = {};
+
+        function openSizeModal(id, img, url) {
+            tempProductData = { id, img, url, size: null };
+            document.getElementById('sizeModal').style.display = 'flex';
+            document.querySelectorAll('.size-btn-opt').forEach(b => b.classList.remove('active'));
+        }
+
+        function closeSizeModal() {
+            document.getElementById('sizeModal').style.display = 'none';
+        }
+
+        function selectSize(btn, size) {
+            document.querySelectorAll('.size-btn-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            tempProductData.size = size;
+        }
+
+        function confirmAndAdd() {
+            if (!tempProductData.size) {
+                alert("Өтініш, өлшемді таңдаңыз!");
+                return;
+            }
+
+            const productItem = document.getElementById(`product-${tempProductData.id}`);
+            const imgElement = productItem ? productItem.querySelector('.product-image') : null;
+            const cartLink = document.getElementById('cart-link');
+
+            if (!imgElement || !cartLink) {
+                addToCartServer();
+                return;
+            }
+
+            const rect = imgElement.getBoundingClientRect();
+            const cartRect = cartLink.getBoundingClientRect();
+            const flyingImg = document.createElement('img');
+            flyingImg.src = tempProductData.img;
+
+            Object.assign(flyingImg.style, {
+                position: 'fixed',
+                zIndex: '10000',
+                top: rect.top + 'px',
+                left: rect.left + 'px',
+                width: rect.width + 'px',
+                height: rect.height + 'px',
+                objectFit: 'cover',
+                borderRadius: '10px',
+                transition: 'all 0.8s cubic-bezier(0.45, 0.05, 0.55, 0.95)',
+                pointerEvents: 'none'
+            });
+
+            document.body.appendChild(flyingImg);
+
+            requestAnimationFrame(() => {
+                Object.assign(flyingImg.style, {
+                    top: (cartRect.top) + 'px',
+                    left: (cartRect.left) + 'px',
+                    width: '30px',
+                    height: '30px',
+                    opacity: '0.3',
+                    transform: 'rotate(720deg) scale(0.2)'
+                });
+            });
+
+            setTimeout(() => {
+                flyingImg.remove();
+                addToCartServer();
+            }, 800);
+        }
+
+        function addToCartServer() {
+            let formData = new FormData();
+            formData.append('quantity', 1);
+            formData.append('size', tempProductData.size);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            fetch(tempProductData.url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(() => {
+                location.reload();
+            });
+        }
+    </script>
+{% endblock %}

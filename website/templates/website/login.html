@@ -1,0 +1,74 @@
+{% load static %}
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <title>Кіру | GULsezim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: #fdfdfd; font-family: 'Montserrat', sans-serif;
+        }
+        .auth-container {
+            width: 100%; max-width: 400px; padding: 40px;
+            background: #fff; border: 1px solid #eee;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02); text-align: center;
+        }
+        h1 { font-weight: 300; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; }
+        p.subtitle { color: #888; font-size: 13px; margin-bottom: 30px; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+        input {
+            width: 100%; padding: 15px; border: 1px solid #e0e0e0;
+            font-family: 'Montserrat', sans-serif; box-sizing: border-box;
+            outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: #000; }
+
+        .btn-black {
+            width: 100%; padding: 16px; background: #000; color: #fff;
+            border: none; cursor: pointer; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 2px; margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn-black:hover { background: #333; }
+
+        .toggle-link { margin-top: 25px; font-size: 12px; color: #666; }
+        .toggle-link a { color: #000; text-decoration: none; font-weight: 600; border-bottom: 1px solid #000; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1>Кіру</h1>
+        <p class="subtitle">Жеке кабинетке қайта оралғаныңызға қуаныштымыз</p>
+
+       <form method="POST" action="{% url 'login' %}">
+    {% csrf_token %}
+    <h1>ЖҮЙЕГЕ КІРУ</h1>
+
+    {% if error %}
+        <p style="color: #ff4d4d; font-size: 12px;">{{ error }}</p>
+    {% endif %}
+
+    <div class="form-group">
+        <label>Электронды пошта</label>
+        <input type="email" name="email" placeholder="Поштаңызды жазыңыз" required>
+    </div>
+
+    <div class="form-group">
+        <label>Құпия сөз</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+    </div>
+
+    <button type="submit" class="btn-black">ЛОГИН</button>
+
+    <div class="toggle-link">
+        Аккаунтыңыз жоқ па? <a href="{% url 'register' %}">Тіркелу</a>
+    </div>
+       </form>
+    </div>
+</body>
+</html>

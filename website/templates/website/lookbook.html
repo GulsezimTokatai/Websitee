@@ -1,0 +1,175 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}Lookbook Download | GULsezim{% endblock %}
+
+{% block extra_css %}
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f4f1ee; font-family: 'Montserrat', sans-serif; margin: 0; background: #fff; color: #000; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 4%; background: #fff; border-bottom: 1px solid #f0f0f0; }
+        .navbar a { color: #000; text-decoration: none; margin: 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; white-space: nowrap; }
+        .navbar .nav-left a:hover, .navbar .nav-right a:hover { color: #888; }
+        .hero { text-align: center; padding: 60px 20px; }
+        .hero h1 { font-weight: 300; font-size: 42px; letter-spacing: 10px; text-transform: uppercase; }
+        .main-container { max-width: 800px; margin: 0 auto; padding: 0 20px 100px; }
+        .info-box { margin-bottom: 40px; }
+        .info-box input, .info-box select { width: 100%; padding: 15px; margin-top: 10px; border: 1px solid #000; outline: none; font-family: 'Montserrat'; }
+        .file-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; }
+        .file-item { border: 1px solid #eee; padding: 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; position: relative; }
+        .file-item:hover { border-color: #000; background: #fafafa; }
+        .file-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: #000; margin-right: 15px; }
+        .file-info { line-height: 1.4; }
+        .file-info span { display: block; font-size: 14px; font-weight: 600; }
+        .file-info small { color: #888; font-size: 11px; }
+        .download-btn { background: #000; color: #fff; border: none; width: 100%; padding: 20px; cursor: pointer; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; transition: 0.3s; }
+        .download-btn:hover { background: #333; letter-spacing: 6px; }
+        .item.in-cart .add-btn { display: none; }
+        .item.in-cart .quantity-controls { display: flex; }
+         .footer {
+            background-color: #000;
+            color: #fff;
+            padding: 60px 8% 30px;
+            width: 100%;
+        }
+        /* Dark Mode үшін арнайы hover стилі */
+[data-theme="dark"] .file-item:hover {
+    background: #1a1a1a !important; /* Қою сұр немесе қара түс */
+    border-color: #fff !important;  /* Жиегі ақ болады */
+}
+
+/* Мәтіндер Dark Mode-та hover кезінде де ақ болып қалуы үшін */
+[data-theme="dark"] .file-item:hover .file-info span {
+    color: #fff !important;
+}
+
+/* Негізгі hover стилін (Light Mode) былай қалдыруға болады */
+.file-item:hover {
+    border-color: #000;
+    background: #fafafa;
+}.footer-content {
+    display: flex;
+    justify-content: space-between; /* Элементтерді екі шетке итереді */
+    align-items: flex-start;
+    max-width: 1200px; /* Сайттың негізгі мазмұнынан асып кетпеуі үшін */
+    margin: 0 auto; /* Ортаға келтіру */
+    padding: 0 4%; /* Шетінен бос орын қалдыру (осы маңызды!) */
+    width: 100%;
+    box-sizing: border-box; /* Padding еніне әсер етпеуі үшін */
+}.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: right;
+    min-width: 150px; /* Блоктың қысылып қалмауын қадағалайды */
+}.footer {
+    background-color: #000;
+    color: #fff;
+    padding: 60px 0 30px; /* Бүйірдегі padding-ті footer-content-ке берген дұрыс */
+    width: 100%;
+    position: relative;
+}
+        .footer-section h3 { font-size: 12px; letter-spacing: 2px; color: #555; margin-bottom: 20px; }
+        .social-icons { display: flex; gap: 15px; }
+        .social-icons img { width: 20px; filter: invert(1); opacity: 0.6; }
+        .footer-links a { display: block; color: #888; text-decoration: none; font-size: 11px; margin-bottom: 10px; text-transform: uppercase; }
+        .footer-bottom { text-align: center; font-size: 10px; color: #333; margin-top: 30px; }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <section class="hero">
+        <h1>Digital Library</h1>
+        <p>GULSEZIM эксклюзивті материалдары мен каталогтары</p>
+    </section>
+
+    <div class="main-container">
+        <div class="info-box">
+            <label>Аты-жөніңіз:</label>
+            <input type="text" id="userName" placeholder="Толық атыңызды жазыңыз...">
+            <br><br>
+            <label>Қызығушылығыңыз:</label>
+            <select id="userInterest">
+                <option value="fashion">Сән трендтері</option>
+                <option value="sale">Жеңілдіктер</option>
+                <option value="new">Жаңа топтама</option>
+            </select>
+        </div>
+
+        <h3>Жүктеу үшін файлдарды таңдаңыз:</h3>
+        <div class="file-grid">
+            <label class="file-item">
+                <input type="checkbox" class="file-check" value="{% static 'website/Күз Қыс каталогы.docx' %}">
+                <div class="file-info">
+                    <span>Күз-Қыс Каталогы</span>
+                    <small> WORD • 15.4 MB</small>
+                </div>
+            </label>
+            <label class="file-item">
+                <input type="checkbox" class="file-check" value="{% static 'website/Size.jpg' %}">
+                <div class="file-info">
+                    <span>Өлшемдер кестесі</span>
+                    <small>JPG • 2.1 MB</small>
+                </div>
+            </label>
+            <label class="file-item">
+                <input type="checkbox" class="file-check" value="{% static 'website/Күтім нұсқаулығы.docx' %}">
+                <div class="file-info">
+                    <span>Күтім нұсқаулығы</span>
+                    <small>WORD • 1.2 MB</small>
+                </div>
+            </label>
+            <label class="file-item">
+                <input type="checkbox" class="file-check" value="{% static 'website/Купон.docx' %}">
+                <div class="file-info">
+                    <span>-20% Купон</span>
+                    <small>WORD • 0.5 MB</small>
+                </div>
+            </label>
+        </div>
+
+        <button class="download-btn" onclick="processDownload()">Жүктеуді бастау</button>
+    </div>
+{% endblock %}
+
+
+{% block extra_js %}
+    <script>
+function processDownload() {
+    const selectedFiles = document.querySelectorAll('.file-check:checked');
+    const nameInput = document.getElementById('userName');
+    const name = nameInput ? nameInput.value.trim() : "";
+
+    if (selectedFiles.length === 0) {
+        alert("Өтініш, файлдарды таңдаңыз!");
+        return;
+    }
+
+    if (name === "") {
+        alert("Жүктеу алдында атыңызды енгізіңіз.");
+        return;
+    }
+
+    selectedFiles.forEach((file, index) => {
+        // Әр файлды 600мс аралықпен жүктеу (браузер бұғаттамас үшін)
+        setTimeout(() => {
+            const fileUrl = file.value;
+            const fileName = fileUrl.split('/').pop(); // Файл атын жолдан бөліп алу
+
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.setAttribute('download', fileName); // Жүктеуге бұйрық беру
+            link.style.display = 'none';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }, index * 600);
+    });
+
+    alert(name + ", файлдарды жүктеу басталды! Браузер рұқсат сұраса, 'Разрешить' басыңыз.");
+}
+    </script>
+
+{% endblock %}

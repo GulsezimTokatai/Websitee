@@ -1,0 +1,273 @@
+{% extends 'website/base.html' %}
+{% load static %}
+
+{% block title %}GULsezim | Style Quiz{% endblock %}
+
+{% block extra_css %}
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+    /* Түстерді базалық айнымалыларға байлаймыз */
+    body {
+        margin: 0;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Montserrat', sans-serif;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 4%;
+        background: var(--nav-bg);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .navbar a {
+        color: var(--text-color);
+        text-decoration: none;
+        margin: 0 8px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .navbar .nav-left a:hover, .navbar .nav-right a:hover { color: var(--footer-muted); }
+
+    .quiz-container { max-width: 700px; margin: 60px auto; padding: 0 20px; }
+
+    h1 {
+        text-align: center;
+        font-weight: 300;
+        font-size: 32px;
+        letter-spacing: 8px;
+        text-transform: uppercase;
+        margin-bottom: 50px;
+        color: var(--text-color);
+    }
+
+    /* Сұрақ карточкалары қараңғы режимде де көрінуі үшін */
+    .question-card {
+        background: var(--nav-bg);
+        border: 1px solid var(--border-color);
+        padding: 35px;
+        margin-bottom: 25px;
+        border-radius: 8px;
+    }
+
+    .q-text {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        color: var(--text-color);
+    }
+
+    .options-list { display: flex; flex-direction: column; gap: 12px; }
+
+    /* Жауап таңдау нұсқалары */
+    .option-label {
+        display: block;
+        padding: 14px 20px;
+        background: var(--input-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 14px;
+        border-radius: 5px;
+    }
+
+    .option-label:hover {
+        background: var(--border-color);
+        opacity: 0.8;
+    }
+
+    .option-label input {
+        margin-right: 12px;
+        accent-color: var(--text-color);
+    }
+
+    /* Батырмалар */
+    .btn-result {
+        display: block;
+        width: 100%;
+        padding: 18px;
+        background: var(--text-color);
+        color: var(--bg-color);
+        border: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        cursor: pointer;
+        margin: 40px 0;
+        border-radius: 5px;
+    }
+
+    .btn-result:hover { opacity: 0.8; }
+
+    /* Нәтиже дисплейі */
+    #result-display {
+        display: none;
+        text-align: center;
+        padding: 40px;
+        border: 2px solid var(--border-color);
+        background: var(--nav-bg);
+        border-radius: 10px;
+        color: var(--text-color);
+    }
+    .footer {
+    background-color: #000; /* Таза қара түс */
+    color: #fff;
+    padding: 50px 8% 25px;
+    border-top: 1px solid #1a1a1a;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.footer-title {
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: #555; /* Өте күңгірт сұр */
+    margin-bottom: 30px;
+}
+
+/* КОНТУРЛЫ ИКОНКАЛАР СТИЛІ */
+.social-icons {
+    display: flex;
+    gap: 25px;
+}
+
+.social-icons img {
+    width: 22px;
+    height: 22px;
+    filter: invert(1); /* Иконканы ақ түсті сызықтарға айналдыру */
+    opacity: 0.5;
+    transition: all 0.4s ease;
+}
+
+.social-icons img:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* ОҢ ЖАҚТАҒЫ ТІЗІМ */
+.footer-right {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: right;
+}
+
+.footer-right a {
+    color: #666; /* Күңгірт жазулар */
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.footer-right a:hover {
+    color: #fff; /* Тышқанды апарғанда ақ болады */
+}
+
+.footer-bottom {
+    margin-top: 60px;
+    text-align: center;
+    font-size: 9px;
+    color: #333;
+    letter-spacing: 3px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="quiz-container">
+        <h1>Style Identity</h1>
+        <form id="quizForm">
+            <div id="questions-target"></div>
+            <button type="button" class="btn-result" onclick="calculateResult()">Нәтижені есептеу</button>
+        </form>
+
+        <div id="result-display">
+            <h2 id="res-title" style="letter-spacing: 3px;"></h2>
+            <p id="res-desc" style="line-height: 1.6; color: #555;"></p>
+            <button onclick="location.reload()" style="background:none; border: 1px solid #000; padding: 10px 20px; cursor: pointer; margin-top: 20px;">Қайтадан тапсыру</button>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extra_js %}
+    <script>
+        const questions = [
+            { q: "Күнделікті образ үшін не таңдайсыз?", a: ["Ақ жейде мен шалбар", "Гүлді принтті көйлек", "Леггинсы мен топ", "Джинсы мен оверсайз", "Былғары белдемше"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Сүйікті түсіңіз?", a: ["Бежевый", "Қызғылт", "Ашық жасыл", "Көк", "Сұр"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Аяқ киім таңдауыңыз?", a: ["Туфли", "Балетки", "Кроссовка", "Кеды", "Бәтеңке"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Маңызды кездесуге не киесіз?", a: ["Стильді костюм", "Нәзік көйлек", "Спорттық стиль", "Еркін киім", "Ерекше дизайн"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Аксессуар таңдау:", a: ["Алтын алқа", "Әдемі шаш қыстырғыш", "Фитнес сағат", "Кепка", "Көп қабатты шынжырлар"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Сөмке таңдау:", a: ["Минималистік сөмке", "Кішкентай клатч", "Рюкзак", "Шоппер", "Cross-body"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Сенбілік кеш қайда өтеді?", a: ["Мейрамханада", "Саябақта", "Спорт залында", "Кофеханада", "Концертте"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Мата таңдау:", a: ["Мақта", "Жібек", "Трикотаж", "Деним", "Былғары"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Шаш үлгісі:", a: ["Жинақы", "Толқынды", "Түйілген", "Табиғи", "Ретсіз"], v: ["classic", "romantic", "sport", "casual", "grunge"] },
+            { q: "Сән әлеміндегі ұраныңыз?", a: ["Сапа бірінші", "Нәзіктік - күш", "Қозғалыс - өмір", "Еркіндік", "Ерекше бол"], v: ["classic", "romantic", "sport", "casual", "grunge"] }
+        ];
+
+        const container = document.getElementById('questions-target');
+        // Динамикалық түрде сұрақтарды шығару
+        if (container) {
+            questions.forEach((item, i) => {
+                let optionsHtml = item.a.map((opt, idx) => `
+                    <label class="option-label">
+                        <input type="radio" name="q${i}" value="${item.v[idx]}" required>
+                        <span>${opt}</span>
+                    </label>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="question-card">
+                        <div class="q-text">${i+1}. ${item.q}</div>
+                        <div class="options-list">${optionsHtml}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function calculateResult() {
+            const quizForm = document.getElementById('quizForm');
+            const form = new FormData(quizForm);
+            const res = {};
+            let count = 0;
+
+            for(let v of form.values()) {
+                res[v] = (res[v] || 0) + 1;
+                count++;
+            }
+
+            if(count < 10) return alert("Барлық сұраққа жауап беріңіз!");
+
+            const top = Object.keys(res).reduce((a, b) => res[a] > res[b] ? a : b);
+            const data = {
+                classic: {t: "КЛАССИКА", d: "Сізге минимализм мен талғампаздық тән. GULsezim-нің негізгі топтамасы сізге арналған."},
+                romantic: {t: "РОМАНТИКА", d: "Нәзіктік пен жеңілдік сіздің басты қаруыңыз. Біздің көйлектерді көріңіз."},
+                sport: {t: "SPORT CHIC", d: "Белсенді өмір мен ыңғайлылықты қатар ұстайсыз."},
+                casual: {t: "CASUAL", d: "Күнделікті өмірде еркін әрі стильді киіну — сіздің таңдауыңыз."},
+                grunge: {t: "GRUNGE", d: "Сіз ерекшесіз және өзіндік көзқарасыңыз бар. Батыл образдар сіздікі."}
+            };
+
+            quizForm.style.display = 'none';
+            const display = document.getElementById('result-display');
+            display.style.display = 'block';
+            document.getElementById('res-title').innerText = data[top].t;
+            document.getElementById('res-desc').innerText = data[top].d;
+        }
+    </script>
+
+{% endblock %}
