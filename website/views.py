@@ -298,13 +298,11 @@ import google.generativeai as genai
 from django.http import JsonResponse
 import logging
 
-# Настройка логирования для отслеживания ошибок в консоли
 logger = logging.getLogger(__name__)
 
-# Рекомендуется выносить ключ в settings.py или .env файл
-API_KEY = "AIzaSyAJjTse0SSxinY7p-Op92LDr-CShSIM7gM"
-genai.configure(api_key=API_KEY)
-
+API_KEY = getattr(settings, "GEMINI_API_KEY", None)
+if API_KEY:
+    genai.configure(api_key=API_KEY)
 
 def chat_with_stylist(request):
     user_message = request.GET.get('message')
