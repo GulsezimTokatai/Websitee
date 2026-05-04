@@ -313,16 +313,13 @@ def chat_with_stylist(request):
         return JsonResponse({'reply': "Сұрақ жазылмады."}, status=400)
 
     try:
-        # 1. Автоматический подбор лучшей доступной модели
         model_list = genai.list_models()
         available_models = [m.name for m in model_list if 'generateContent' in m.supported_generation_methods]
 
-        # Приоритет отдаем 1.5-flash как самой быстрой, если нет — берем первую из списка
         selected_model_name = next((m for m in available_models if "gemini-1.5-flash" in m), None)
         if not selected_model_name:
             selected_model_name = available_models[0] if available_models else "gemini-pro"
 
-        # 2. Инициализация модели с системной инструкцией
         model = genai.GenerativeModel(
             model_name=selected_model_name,
             system_instruction="Сен — кәсіби стилистсің. Жауаптарыңды тек қазақ тілінде жаз. "
@@ -331,7 +328,6 @@ def chat_with_stylist(request):
             "Пайдаланушыға киім түстері мен күтім туралы нақты ұсыныс айт."
         )
 
-        # 3. Генерация контента
         response = model.generate_content(user_message)
 
         if response and response.text:
@@ -340,11 +336,10 @@ def chat_with_stylist(request):
             return JsonResponse({'reply': "AI жауап бере алмады, қайта сұрап көріңіз."})
 
     except Exception as e:
-        # Выводит детальную ошибку в терминал Django
         print(f"--- ОШИБКА GEMINI API ---: {str(e)}")
         logger.error(f"Gemini Error: {e}")
 
         return JsonResponse({
             'reply': "Байланыс орнату мүмкін болмады. Қайта көріңіз.",
-            'details': str(e)  # Можно убрать на продакшне
+            'details': str(e)
         })
